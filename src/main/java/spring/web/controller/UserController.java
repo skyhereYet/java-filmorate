@@ -36,6 +36,7 @@ class UserController {
         users.put(user.getId(), user);
         return user;
     }
+
     @GetMapping("/users")
     public List<User> getUsers() {
         log.info("GET request");
@@ -43,7 +44,7 @@ class UserController {
     }
 
     private void validate(User user) {
-        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")){
+        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             log.debug("Login empty or contains space");
             throw new ValidationException("Login empty or contains space");
         }
