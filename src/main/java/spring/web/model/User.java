@@ -8,7 +8,7 @@ import javax.validation.constraints.Email;
 import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor(onConstructor_={@JsonCreator(mode = JsonCreator.Mode.PROPERTIES)})
+@AllArgsConstructor(onConstructor_ = {@JsonCreator(mode = JsonCreator.Mode.PROPERTIES)})
 public class User {
     private int id;
     @Email
