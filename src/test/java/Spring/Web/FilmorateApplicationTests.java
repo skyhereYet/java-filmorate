@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class FilmorateApplicationTests {
 	URI uri;
-	String URL = "http://localhost:8080";
+	String url = "http://localhost:8080";
 	HttpRequest request;
 	Gson gson = getGson();
 
@@ -47,7 +47,7 @@ class FilmorateApplicationTests {
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonFilm);
-		uri = URI.create(URL + "/films");
+		uri = URI.create(url + "/films");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -82,7 +82,7 @@ class FilmorateApplicationTests {
 				.build();
 		response = httpClient.send(request,HttpResponse.BodyHandlers.ofString());
 		assertEquals(200, response.statusCode());
-		assertEquals(jsonFilm, response.body().substring(1, response.body().length()-1));
+		assertEquals(jsonFilm, response.body().substring(1, response.body().length() - 1));
 	}
 
 	@Test
@@ -96,7 +96,7 @@ class FilmorateApplicationTests {
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonFilm);
-		uri = URI.create(URL + "/films");
+		uri = URI.create(url + "/films");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -120,7 +120,7 @@ class FilmorateApplicationTests {
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonFilm);
-		uri = URI.create(URL + "/films");
+		uri = URI.create(url + "/films");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -142,7 +142,7 @@ class FilmorateApplicationTests {
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonFilm);
-		uri = URI.create(URL + "/films");
+		uri = URI.create(url + "/films");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -164,7 +164,7 @@ class FilmorateApplicationTests {
 		String jsonFilm = gson.toJson(filmNegativeDuration);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonFilm);
-		uri = URI.create(URL + "/films");
+		uri = URI.create(url + "/films");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -204,7 +204,7 @@ class FilmorateApplicationTests {
 		String jsonUser = gson.toJson(user);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonUser);
-		uri = URI.create(URL + "/users");
+		uri = URI.create(url + "/users");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -239,7 +239,7 @@ class FilmorateApplicationTests {
 				.build();
 		response = httpClient.send(request,HttpResponse.BodyHandlers.ofString());
 		assertEquals(200, response.statusCode());
-		assertEquals(jsonUser, response.body().substring(1, response.body().length()-1));
+		assertEquals(jsonUser, response.body().substring(1, response.body().length() - 1));
 	}
 
 	@Test
@@ -253,7 +253,7 @@ class FilmorateApplicationTests {
 		String jsonUser = gson.toJson(user);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonUser);
-		uri = URI.create(URL + "/users");
+		uri = URI.create(url + "/users");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -275,7 +275,7 @@ class FilmorateApplicationTests {
 		String jsonUser = gson.toJson(user);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonUser);
-		uri = URI.create(URL + "/users");
+		uri = URI.create(url + "/users");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -298,7 +298,7 @@ class FilmorateApplicationTests {
 		String jsonUser = gson.toJson(userEmptyLogin);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonUser);
-		uri = URI.create(URL + "/users");
+		uri = URI.create(url + "/users");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -317,7 +317,7 @@ class FilmorateApplicationTests {
 		jsonUser = gson.toJson(userLoginWithSpace);
 		httpClient = HttpClient.newHttpClient();
 		body = HttpRequest.BodyPublishers.ofString(jsonUser);
-		uri = URI.create(URL + "/users");
+		uri = URI.create(url + "/users");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -339,7 +339,7 @@ class FilmorateApplicationTests {
 		String jsonUser = gson.toJson(user);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonUser);
-		uri = URI.create(URL + "/users");
+		uri = URI.create(url + "/users");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
@@ -363,7 +363,7 @@ class FilmorateApplicationTests {
 		String jsonUser = gson.toJson(user);
 		HttpClient httpClient = HttpClient.newHttpClient();
 		HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jsonUser);
-		uri = URI.create(URL + "/users");
+		uri = URI.create(url + "/users");
 		request = HttpRequest.newBuilder()
 				.POST(body)
 				.uri(uri)
