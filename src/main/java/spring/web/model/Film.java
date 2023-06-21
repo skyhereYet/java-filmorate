@@ -23,7 +23,7 @@ public class Film {
     @NotNull
     @NotEmpty
     private final String name;
-    @Size(max=200, message = "Description more 200 characters")
+    @Size(max = 200, message = "Description more 200 characters")
     private final String description;
     @ReleaseDateChecker
     private final LocalDate releaseDate;
