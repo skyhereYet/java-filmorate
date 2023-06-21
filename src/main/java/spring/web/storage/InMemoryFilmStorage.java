@@ -8,7 +8,7 @@ import spring.web.model.Film;
 import java.util.*;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> filmsStorage = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 

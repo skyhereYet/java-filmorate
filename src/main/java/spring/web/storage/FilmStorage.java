@@ -14,5 +14,7 @@ public interface FilmStorage {
 
     Optional<Film> findFilmById(int id);
 
+    Optional<Film> filmExist(Film film);
+
     List<Film> getFilmsStorage();
 }
