@@ -4,24 +4,35 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor(onConstructor_ = {@JsonCreator(mode = JsonCreator.Mode.PROPERTIES)})
 @Builder
 public class User {
     private int id;
-    @NonNull
+    private final List<Integer> friends = new ArrayList<>();
+    @NotNull
     @Email
     @NotEmpty
     private final String email;
     @NotEmpty
-    @NonNull
+    @NotNull
+    @NotBlank
     private final String login;
     private String name;
-    @NonNull
+    @NotNull
+    @PastOrPresent
     private final LocalDate birthday;
+
+    public void addFriend(int idFriend) {
+        friends.add(idFriend);
+    }
+
+    public void deleteFriend(int idFriend) {
+        friends.remove(friends.indexOf(idFriend));
+    }
 }

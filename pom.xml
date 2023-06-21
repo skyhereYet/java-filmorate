@@ -80,7 +80,7 @@
 			<artifactId>logback-core</artifactId>
 			<version>1.4.7</version>
 		</dependency>
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<defaultGoal>deploy</defaultGoal>

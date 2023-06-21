@@ -2,62 +2,67 @@ package spring.web.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import spring.web.model.Film;
-import spring.web.exception.ValidationException;
+import spring.web.service.FilmService;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
+@RequestMapping("/films")
 public class FilmController {
-    private int id = 1;
-    private final Map<Integer, Film> films = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
+    @Autowired
+    private FilmService filmService;
 
-    @PostMapping("/films")
+    @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("POST request");
-        validate(film);
-        film.setId(id++);
-        films.put(film.getId(), film);
+        filmService.createOrThrow(film);
         log.info("Film add: " + film.toString());
         return film;
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         log.info("PUT request");
-        if (!films.containsKey(film.getId())) {
-            throw new ValidationException("Invalid id film. Request id = " + film.getId());
-        }
-        validate(film);
-        films.put(film.getId(), film);
+        filmService.updateOrThrow(film);
         log.info("Film update: " + film.toString());
         return film;
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> getFilms() {
         log.info("GET request");
-        return new ArrayList<>(films.values());
+        return filmService.getFilmsList();
     }
 
-    private void validate(Film film) {
-        if (film.getDescription().length() > 200) {
-            log.debug("Description more than 200 characters");
-            throw new ValidationException("Description more 200 characters");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.debug("Release date earlier than 28.12.1895");
-            throw new ValidationException("Release date earlier 28.12.1895");
-        }
-        if (film.getDuration().isNegative() || film.getDuration().isZero()) {
-            log.debug("Film duration is negative or zero");
-            throw new ValidationException("Film duration is negative or zero");
-        }
+    @PutMapping(value = "/{id}/like/{userId}")
+    public Film addFriendToUser(@PathVariable("id") int idFilm,
+                                @PathVariable("userId") int idUser) {
+        Film filmToReturn = filmService.addLikeOrThrow(idFilm, idUser);
+        log.info("The film (ID - " + idFilm + ") was liked by the user ID - " + idUser);
+        return filmToReturn;
+    }
+
+    @DeleteMapping(value = "/{id}/like/{userId}")
+    public Film deleteFriendToUser(@PathVariable("id") int idFilm,
+                                @PathVariable("userId") int idUser) {
+        Film filmToReturn = filmService.deleteLikeOrThrow(idFilm, idUser);
+        log.info("The film (ID - " + idFilm + ") was disliked by the user ID - " + idUser);
+        return filmToReturn;
+    }
+
+    @GetMapping(value = "/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        log.info("GET request - get user by ID - " + id);
+        return filmService.getFilmByIdOrThrow(id);
+    }
+
+    @GetMapping(value = "/popular")
+    public List<Film> getFilmPopular(@RequestParam(defaultValue = "10", required = false) Integer count) {
+        log.info("GET request - get popular film (count - " + count + ")");
+        return filmService.getFilmPopular(count);
     }
 }

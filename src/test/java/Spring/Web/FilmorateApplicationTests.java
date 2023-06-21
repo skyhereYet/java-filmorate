@@ -8,7 +8,6 @@ import spring.web.adapters.DurationAdapter;
 import spring.web.model.Film;
 import spring.web.model.User;
 import spring.web.adapters.LocalDateAdapter;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,7 +15,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -56,6 +54,8 @@ class FilmorateApplicationTests {
 		HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
 		HttpResponse<String> response = httpClient.send(request, handler);
 		assertEquals(200, response.statusCode());
+		response = httpClient.send(request, handler);
+		assertEquals(500, response.statusCode());
 		//PUT request
 		final Film filmUpdate = Film.builder()
 				.id(1)
@@ -128,7 +128,7 @@ class FilmorateApplicationTests {
 				.build();
 		HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
 		HttpResponse<String> response = httpClient.send(request, handler);
-		assertEquals(500, response.statusCode());
+		assertEquals(400, response.statusCode());
 	}
 
 	@Test
@@ -150,7 +150,7 @@ class FilmorateApplicationTests {
 				.build();
 		HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
 		HttpResponse<String> response = httpClient.send(request, handler);
-		assertEquals(500, response.statusCode());
+		assertEquals(400, response.statusCode());
 	}
 
 	@Test
@@ -172,7 +172,7 @@ class FilmorateApplicationTests {
 				.build();
 		HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
 		HttpResponse<String> response = httpClient.send(request, handler);
-		assertEquals(500, response.statusCode());
+		assertEquals(400, response.statusCode());
 		final Film filmZeroDuration = Film.builder()
 				.name("New")
 				.description("Some description")
@@ -189,7 +189,7 @@ class FilmorateApplicationTests {
 				.build();
 		handler = HttpResponse.BodyHandlers.ofString();
 		response = httpClient.send(request, handler);
-		assertEquals(500, response.statusCode());
+		assertEquals(400, response.statusCode());
 	}
 
 	@Test
@@ -371,6 +371,6 @@ class FilmorateApplicationTests {
 				.build();
 		HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
 		HttpResponse<String> response = httpClient.send(request, handler);
-		assertEquals(500, response.statusCode());
+		assertEquals(400, response.statusCode());
 	}
 }

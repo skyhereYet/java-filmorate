@@ -4,57 +4,75 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import spring.web.model.User;
-import spring.web.exception.ValidationException;
+import spring.web.service.UserService;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
+@RequestMapping("/users")
 class UserController {
-    private int id = 1;
-    private Map<Integer, User> users = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private UserService userService;
 
-    @PostMapping("/users")
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.info("POST request");
-        validate(user);
-        user.setId(id++);
-        users.put(user.getId(), user);
+        userService.createOrThrow(user);
+        log.info("User add: " + user.toString());
         return user;
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User update(@Valid @RequestBody User user) {
         log.info("PUT request");
-        validate(user);
-        if (!users.containsKey(user.getId())) {
-            throw new ValidationException("User id = " + user.getId() + " not found");
-        }
-        users.put(user.getId(), user);
+        userService.updateOrThrow(user);
+        log.info("User update: " + user.toString());
         return user;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> getUsers() {
         log.info("GET request");
-        return new ArrayList<>(users.values());
+        return userService.getUserList();
     }
 
-    private void validate(User user) {
-        if (user.getLogin().contains(" ")) {
-            log.debug("Login contains space");
-            throw new ValidationException("Login contains space");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.debug("Birthday from future");
-            throw new ValidationException("Birthday from future");
-        }
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+    @GetMapping(value = "/{id}")
+    public User getUserById(@PathVariable int id) {
+        log.info("GET request - get user by ID - " + id);
+        return userService.getUserByIdOrThrow(id);
+    }
+
+    @PutMapping(value = "/{id}/friends/{friendId}")
+    public User addFriendToUser(@PathVariable("id") int idUser,
+                                @PathVariable("friendId") int idFriend) {
+        User userToReturn = userService.addFriendByIdOrThrow(idUser, idFriend);
+        log.info("User id = " + idFriend + " was add to friend list user id = " + idUser);
+        return userToReturn;
+    }
+
+    @DeleteMapping(value = "/{id}/friends/{friendId}")
+    public User deleteFriendFromUser(@PathVariable("id") int idUser,
+                                   @PathVariable("friendId") int idFriend) {
+        User userToReturn = userService.deleteFriendByIdOrThrow(idUser, idFriend);
+        log.info("Friend with id = " + idFriend + " removed from user's friends id = " + idUser);
+        return userToReturn;
+    }
+
+    @GetMapping(value = "/{id}/friends")
+    public List<User> getUserFriendsById(@PathVariable int id) {
+        log.info("GET request - get user friends by ID - " + id);
+        return userService.getUserFriends(id);
+    }
+
+    @GetMapping(value = "{id}/friends/common/{otherId}")
+    public List<User> getUserFriendsById(@PathVariable("id") int idUser,
+                                         @PathVariable("otherId") int otherId) {
+        log.info("GET request - list of common friends with the user ID - " + idUser
+                + " and friend with ID - " + otherId);
+        return userService.getCommonFriends(idUser, otherId);
     }
 }
