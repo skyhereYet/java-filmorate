@@ -55,7 +55,7 @@ class FilmorateApplicationTests {
 		HttpResponse<String> response = httpClient.send(request, handler);
 		assertEquals(200, response.statusCode());
 		response = httpClient.send(request, handler);
-		assertEquals(500, response.statusCode());
+		assertEquals(404, response.statusCode());
 		//PUT request
 		final Film filmUpdate = Film.builder()
 				.id(1)
@@ -239,7 +239,7 @@ class FilmorateApplicationTests {
 				.build();
 		response = httpClient.send(request,HttpResponse.BodyHandlers.ofString());
 		assertEquals(200, response.statusCode());
-		assertEquals(jsonUser, response.body().substring(1, response.body().length() - 1));
+		assertEquals(userUpdate, gson.fromJson(response.body().substring(1, response.body().length()-1), User.class));
 	}
 
 	@Test
@@ -325,7 +325,7 @@ class FilmorateApplicationTests {
 				.build();
 		handler = HttpResponse.BodyHandlers.ofString();
 		response = httpClient.send(request, handler);
-		assertEquals(500, response.statusCode());
+		assertEquals(400, response.statusCode());
 	}
 
 	@Test

@@ -40,7 +40,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Optional<Film> filmExist(Film film) {
-        if (filmsStorage.containsKey(film.getId())) {
+        if (filmsStorage.containsValue(film)) {
             return Optional.of(film);
         }
         return Optional.empty();

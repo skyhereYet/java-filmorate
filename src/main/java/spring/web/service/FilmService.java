@@ -34,7 +34,7 @@ public class FilmService {
     }
 
     public Film updateOrThrow(Film film) {
-        if (inMemoryFilmStorage.filmExist(film).isPresent()) {
+        if (inMemoryFilmStorage.findFilmById(film.getId()).isPresent()) {
             inMemoryFilmStorage.update(film);
             return film;
         }  else {
