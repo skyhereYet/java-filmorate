@@ -239,7 +239,7 @@ class FilmorateApplicationTests {
 				.build();
 		response = httpClient.send(request,HttpResponse.BodyHandlers.ofString());
 		assertEquals(200, response.statusCode());
-		assertEquals(userUpdate, gson.fromJson(response.body().substring(1, response.body().length()-1), User.class));
+		assertEquals(userUpdate, gson.fromJson(response.body().substring(1, response.body().length() - 1), User.class));
 	}
 
 	@Test
