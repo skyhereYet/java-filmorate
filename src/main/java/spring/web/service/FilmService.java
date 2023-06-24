@@ -59,7 +59,7 @@ public class FilmService {
             log.info("The film (ID - " + idFilm + ") was liked by the user ID - " + idUser);
             return filmO.get();
         } else {
-            throw new FilmExistException("Film or user not found");
+            throw new FilmExistException("The film with ID -" + idFilm + " not found");
         }
     }
 
@@ -74,7 +74,7 @@ public class FilmService {
             }
             throw new FilmExistException("The film (ID - " + idFilm + ") was not liked by the user ID - " + idUser);
         } else {
-            throw new FilmExistException("Film or user not found");
+            throw new FilmExistException("The film with ID -" + idFilm + " not found");
         }
     }
 
@@ -89,10 +89,9 @@ public class FilmService {
     }
 
     public List<Film> getFilmPopular(int count) {
-        List<Film> list = inMemoryFilmStorage.getFilmsStorage().stream()
+        return inMemoryFilmStorage.getFilmsStorage().stream()
                 .sorted((f0, f1) -> Integer.compare(f1.getLikes().size(), f0.getLikes().size()))
                 .limit(count)
                 .collect(Collectors.toList());
-        return list;
     }
 }

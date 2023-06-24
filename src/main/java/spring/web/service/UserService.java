@@ -5,13 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spring.web.controller.FilmController;
-import spring.web.exception.FilmExistException;
 import spring.web.exception.UserExistException;
 import spring.web.exception.ValidationException;
 import spring.web.model.User;
 import spring.web.storage.UserStorage;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -23,8 +22,8 @@ public class UserService {
     public User createOrThrow(User user) {
         validateOrThrow(user);
         if (inMemoryUserStorage.userExist(user).isPresent()) {
-            log.info("User exists in the storage: " + user);
-            throw new FilmExistException("The movie exists in the storage: " + user);
+            log.info("The user exists in the storage: " + user);
+            throw new UserExistException("The user exist in the storage: " + user);
         } else {
             user.setId(id++);
             inMemoryUserStorage.save(user);
@@ -39,7 +38,7 @@ public class UserService {
             return user;
         }  else {
             log.info("User not exists in the storage: " + user);
-            throw new FilmExistException("The movie not exists in the storage: " + user);
+            throw new UserExistException("The user not exist in the storage: " + user);
         }
     }
 
@@ -59,46 +58,48 @@ public class UserService {
     }
 
     public User addFriendByIdOrThrow(int idUser, int idFriend) {
-        if (inMemoryUserStorage.findUserById(idUser).isPresent()
-                && inMemoryUserStorage.findUserById(idFriend).isPresent()) {
-            if (inMemoryUserStorage.getUsersStorage().get(idUser).getFriends().contains(idFriend)) {
-                throw new UserExistException("Friend already added to user friends");
-            }
-            Optional<User> userO = inMemoryUserStorage.addFriend(idUser, idFriend);
-            Optional<User> userFriendO = inMemoryUserStorage.addFriend(idFriend, idUser);
-            if (userO.isPresent() && userFriendO.isPresent()) {
-                log.info("User id = " + idFriend + " was add to friend list user id = " + idUser);
-                log.info("User id = " + idUser + " was add to friend list user id = " + idFriend);
-                return userO.get();
-            } else {
-                throw new UserExistException("Unexpected error when adding a friend");
-            }
+        if (inMemoryUserStorage.findUserById(idUser).isEmpty()
+                || inMemoryUserStorage.findUserById(idFriend).isEmpty()) {
+            throw new UserExistException("User or friend not found. ID user - " + idUser + ". ID friend - " + idFriend);
+        }
+        if (getUserFriends(idUser).contains(idFriend) || getUserFriends(idFriend).contains(idUser)) {
+            throw new UserExistException("Method addFriendByIdOrThrow. Friend already added to user friends. " +
+                    "ID user - " + idUser + ". ID friend - " + idFriend);
+        }
+        Optional<User> userO = inMemoryUserStorage.addFriend(idUser, idFriend);
+        Optional<User> userFriendO = inMemoryUserStorage.addFriend(idFriend, idUser);
+        if (userO.isPresent() && userFriendO.isPresent()) {
+            log.info("User id = " + idFriend + " was add to friend list user id = " + idUser);
+            log.info("User id = " + idUser + " was add to friend list user id = " + idFriend);
+            return userO.get();
         } else {
-            throw new UserExistException("User or friend not found");
+            throw new UserExistException("Unexpected error when adding a friend");
         }
     }
 
     public User deleteFriendByIdOrThrow(int idUser, int idFriend) {
-        if (inMemoryUserStorage.findUserById(idUser).isPresent()
-                && inMemoryUserStorage.findUserById(idFriend).isPresent()) {
-            Optional<User> userO = inMemoryUserStorage.deleteFriend(idUser, idFriend);
-            if (userO.isPresent()) {
-                log.info("Friend with id = " + idFriend + " removed from user's friends id = " + idUser);
-                return userO.get();
-            } else {
-                throw new UserExistException("Unexpected error when deleting a friend");
-            }
+        if (inMemoryUserStorage.findUserById(idUser).isEmpty()
+                || inMemoryUserStorage.findUserById(idFriend).isEmpty()) {
+            throw new UserExistException("User or friend not found. ID user - " + idUser + ". ID friend - " + idFriend);
+        }
+        Optional<User> userO = inMemoryUserStorage.deleteFriend(idUser, idFriend);
+        Optional<User> userFriendO = inMemoryUserStorage.deleteFriend(idFriend, idUser);
+        if (userO.isPresent() && userFriendO.isPresent()) {
+            log.info("Friend with id = " + idFriend + " removed from user's friends id = " + idUser);
+            log.info("Friend with id = " + idUser + " removed from user's friends id = " + idFriend);
+            return userO.get();
         } else {
-            throw new UserExistException("User or friend not found");
+            throw new UserExistException("Unexpected error when deleting a friend");
         }
     }
 
     public List<User> getUserFriends(int idUser) {
         Optional<User> userO = inMemoryUserStorage.findUserById(idUser);
         if (userO.isPresent()) {
-            List<User> toReturn = new ArrayList<>();
-            userO.get().getFriends().forEach(u -> toReturn.add(inMemoryUserStorage.findUserById(u).get()));
-            return toReturn;
+            return userO.get().getFriends().stream()
+                            .filter(idU -> inMemoryUserStorage.findUserById(idU).isPresent())
+                            .map(idU -> inMemoryUserStorage.findUserById(idU).get())
+                            .collect(Collectors.toList());
         } else {
             throw new UserExistException("User not found");
         }
@@ -118,13 +119,11 @@ public class UserService {
         Optional<User> userO = inMemoryUserStorage.findUserById(idUser);
         Optional<User> otherUserO = inMemoryUserStorage.findUserById(otherId);
         if (userO.isPresent() && otherUserO.isPresent()) {
-            List<User> toReturn = new ArrayList<>();
-            userO.get().getFriends().stream().forEach(uID -> {
-                if (otherUserO.get().getFriends().contains(uID)) {
-                    toReturn.add(inMemoryUserStorage.findUserById(uID).get());
-                }
-            });
-            return toReturn;
+            return userO.get().getFriends().stream()
+                    .filter(otherUserO.get().getFriends()::contains)
+                    .filter(idU -> inMemoryUserStorage.findUserById(idU).isPresent())
+                    .map(idU -> inMemoryUserStorage.findUserById(idU).get())
+                    .collect(Collectors.toList());
         } else {
             throw new UserExistException("Someone user not exist");
         }
