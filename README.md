@@ -1,4 +1,4 @@
 # java-filmorate
 Template repository for Filmorate project.
 
-![Схема БД](Filmorate_BD.png)
+![Схема базы данных](Filmorate_BD.png)
