@@ -8,14 +8,15 @@ import spring.web.model.User;
 import java.util.*;
 
 @Component
-public class InMemoryUserStorage implements UserStorage {
-    private final Map<Integer, User> usersStorage = new HashMap<>();
+public class InMemoryUserStorage /*implements UserStorage*/ {
+    /*private final Map<Integer, User> usersStorage = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Override
-    public void save(User user) {
+    public User save(User user) {
         usersStorage.put(user.getId(), user);
         log.info("User add: " + user.toString());
+        return user;
     }
 
     @Override
@@ -67,5 +68,5 @@ public class InMemoryUserStorage implements UserStorage {
             log.error(e.getMessage());
             return Optional.empty();
         }
-    }
+    }*/
 }

@@ -15,26 +15,28 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     @Autowired
-    private UserStorage inMemoryUserStorage;
+    private UserStorage userDbStorage;
     private int id = 1;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     public User createOrThrow(User user) {
         validateOrThrow(user);
-        if (inMemoryUserStorage.userExist(user).isPresent()) {
+        /*if (userDbStorage.userExist(user).isPresent()) {
             log.info("The user exists in the storage: " + user);
             throw new UserExistException("The user exist in the storage: " + user);
         } else {
-            user.setId(id++);
-            inMemoryUserStorage.save(user);
-        }
+            //user.setId(id++);
+            userDbStorage.save(user);
+        }*/
+
+        userDbStorage.save(user);
         return user;
     }
 
     public User updateOrThrow(User user) {
         validateOrThrow(user);
-        if (inMemoryUserStorage.userExist(user).isPresent()) {
-            inMemoryUserStorage.update(user);
+        if (userDbStorage.userExist(user).isPresent()) {
+            userDbStorage.update(user);
             return user;
         }  else {
             log.info("User not exists in the storage: " + user);
@@ -44,11 +46,11 @@ public class UserService {
 
     public List<User> getUserList() {
         log.info("Return user storage list");
-        return inMemoryUserStorage.getUsersStorage();
+        return userDbStorage.getUsersStorage();
     }
 
     public User getUserByIdOrThrow(int id) {
-        Optional<User> userO = inMemoryUserStorage.findUserById(id);
+        Optional<User> userO = userDbStorage.findUserById(id);
         if (userO.isPresent()) {
             log.info("Return user - " + userO.get());
             return userO.get();
@@ -58,16 +60,16 @@ public class UserService {
     }
 
     public User addFriendByIdOrThrow(int idUser, int idFriend) {
-        if (inMemoryUserStorage.findUserById(idUser).isEmpty()
-                || inMemoryUserStorage.findUserById(idFriend).isEmpty()) {
+        if (userDbStorage.findUserById(idUser).isEmpty()
+                || userDbStorage.findUserById(idFriend).isEmpty()) {
             throw new UserExistException("User or friend not found. ID user - " + idUser + ". ID friend - " + idFriend);
         }
         if (getUserFriends(idUser).contains(idFriend) || getUserFriends(idFriend).contains(idUser)) {
             throw new UserExistException("Method addFriendByIdOrThrow. Friend already added to user friends. " +
                     "ID user - " + idUser + ". ID friend - " + idFriend);
         }
-        Optional<User> userO = inMemoryUserStorage.addFriend(idUser, idFriend);
-        Optional<User> userFriendO = inMemoryUserStorage.addFriend(idFriend, idUser);
+        Optional<User> userO = userDbStorage.addFriend(idUser, idFriend);
+        Optional<User> userFriendO = userDbStorage.addFriend(idFriend, idUser);
         if (userO.isPresent() && userFriendO.isPresent()) {
             log.info("User id = " + idFriend + " was add to friend list user id = " + idUser);
             log.info("User id = " + idUser + " was add to friend list user id = " + idFriend);
@@ -78,12 +80,12 @@ public class UserService {
     }
 
     public User deleteFriendByIdOrThrow(int idUser, int idFriend) {
-        if (inMemoryUserStorage.findUserById(idUser).isEmpty()
-                || inMemoryUserStorage.findUserById(idFriend).isEmpty()) {
+        if (userDbStorage.findUserById(idUser).isEmpty()
+                || userDbStorage.findUserById(idFriend).isEmpty()) {
             throw new UserExistException("User or friend not found. ID user - " + idUser + ". ID friend - " + idFriend);
         }
-        Optional<User> userO = inMemoryUserStorage.deleteFriend(idUser, idFriend);
-        Optional<User> userFriendO = inMemoryUserStorage.deleteFriend(idFriend, idUser);
+        Optional<User> userO = userDbStorage.deleteFriend(idUser, idFriend);
+        Optional<User> userFriendO = userDbStorage.deleteFriend(idFriend, idUser);
         if (userO.isPresent() && userFriendO.isPresent()) {
             log.info("Friend with id = " + idFriend + " removed from user's friends id = " + idUser);
             log.info("Friend with id = " + idUser + " removed from user's friends id = " + idFriend);
@@ -94,11 +96,11 @@ public class UserService {
     }
 
     public List<User> getUserFriends(int idUser) {
-        Optional<User> userO = inMemoryUserStorage.findUserById(idUser);
+        Optional<User> userO = userDbStorage.findUserById(idUser);
         if (userO.isPresent()) {
             return userO.get().getFriends().stream()
-                            .filter(idU -> inMemoryUserStorage.findUserById(idU).isPresent())
-                            .map(idU -> inMemoryUserStorage.findUserById(idU).get())
+                            .filter(idU -> userDbStorage.findUserById(idU).isPresent())
+                            .map(idU -> userDbStorage.findUserById(idU).get())
                             .collect(Collectors.toList());
         } else {
             throw new UserExistException("User not found");
@@ -116,13 +118,13 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(int idUser, int otherId) {
-        Optional<User> userO = inMemoryUserStorage.findUserById(idUser);
-        Optional<User> otherUserO = inMemoryUserStorage.findUserById(otherId);
+        Optional<User> userO = userDbStorage.findUserById(idUser);
+        Optional<User> otherUserO = userDbStorage.findUserById(otherId);
         if (userO.isPresent() && otherUserO.isPresent()) {
             return userO.get().getFriends().stream()
                     .filter(otherUserO.get().getFriends()::contains)
-                    .filter(idU -> inMemoryUserStorage.findUserById(idU).isPresent())
-                    .map(idU -> inMemoryUserStorage.findUserById(idU).get())
+                    .filter(idU -> userDbStorage.findUserById(idU).isPresent())
+                    .map(idU -> userDbStorage.findUserById(idU).get())
                     .collect(Collectors.toList());
         } else {
             throw new UserExistException("Someone user not exist");

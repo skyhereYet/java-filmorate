@@ -21,6 +21,7 @@ class UserController {
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.info("POST request");
+        System.out.println("test");
         userService.createOrThrow(user);
         log.info("User add: " + user.toString());
         return user;
