@@ -21,15 +21,12 @@ public class UserService {
 
     public User createOrThrow(User user) {
         validateOrThrow(user);
-        /*if (userDbStorage.userExist(user).isPresent()) {
+        if (userDbStorage.userExist(user).isPresent()) {
             log.info("The user exists in the storage: " + user);
             throw new UserExistException("The user exist in the storage: " + user);
         } else {
-            //user.setId(id++);
             userDbStorage.save(user);
-        }*/
-
-        userDbStorage.save(user);
+        }
         return user;
     }
 

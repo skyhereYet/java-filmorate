@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import spring.web.controller.FilmController;
 import spring.web.model.User;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,13 +64,17 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> userExist(User user) {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY " +
                 "from USERS " +
-                "where EMAIL = :email and LOGIN = :login and NAME = :name and BIRTHDAY = :birthday";
-        MapSqlParameterSource mapQuery = getMapQuery(user);
-        jdbcOperations.query(sqlQuery, mapQuery);
-        user.setId(Objects.requireNonNull(keyHolder.getKey().intValue()));
-        log.info("User add: " + user.toString());
-        return user;
-        return Optional.empty();
+                "where EMAIL = :email " +
+                "and LOGIN = :login " +
+                "and NAME = :name " +
+                "and BIRTHDAY = :birthday";
+        log.info("Query send: " + sqlQuery);
+        return Optional.of((User) jdbcOperations.query(sqlQuery,
+                Map.of("EMAIL", user.getEmail(),
+                "LOGIN", user.getLogin(),
+                "NAME", user.getName(),
+                "BIRTHDAY", user.getBirthday()),
+                new UserRowMapper()));
     }
 
     @Override
@@ -83,5 +90,17 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Optional<User> deleteFriend(int idUser, int idFriend) {
         return Optional.empty();
+    }
+
+    private static class UserRowMapper implements RowMapper<User> {
+        @Override
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new User(rs.getInt("USERS_ID"),
+                    rs.getString("EMAIL"),
+                    rs.getString("LOGIN"),
+                    rs.getString("NAME"),
+                    rs.getDate("BIRTHDAY").toLocalDate()
+            );
+        }
     }
 }
