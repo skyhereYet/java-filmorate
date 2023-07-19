@@ -37,59 +37,94 @@ public class UserDbStorage implements UserStorage {
         MapSqlParameterSource mapQuery = getMapQuery(user);
         jdbcOperations.update(sqlQuery, mapQuery, keyHolder);
         user.setId(Objects.requireNonNull(keyHolder.getKey().intValue()));
-        log.info("User add: " + user.toString());
+        log.info("User add: " + user);
         return user;
     }
 
-    private MapSqlParameterSource getMapQuery(User user) {
-        MapSqlParameterSource mapToReturn = new MapSqlParameterSource();
-        mapToReturn.addValue("email", user.getEmail());
-        mapToReturn.addValue("login", user.getLogin());
-        mapToReturn.addValue("name", user.getName());
-        mapToReturn.addValue("birthday", user.getBirthday());
-        return mapToReturn;
-    }
-
     @Override
-    public void update(User user) {
-
+    public User update(User user) {
+        final String sqlQuery = "update USERS set EMAIL = :email, LOGIN = :login, NAME = :name, BIRTHDAY = :birthday " +
+                "where users_id = :users_id";
+        MapSqlParameterSource mapQuery = getMapQuery(user);
+        jdbcOperations.update(sqlQuery, mapQuery);
+        log.info("User update: " + user.toString());
+        return user;
     }
 
     @Override
     public Optional<User> findUserById(int id) {
-        return Optional.empty();
+        final String sqlQuery = "select * from USERS where USERS_ID = :users_id";
+        final List<User> userExistList = jdbcOperations.query(sqlQuery, Map.of("users_id", id), new UserRowMapper());
+        if (userExistList.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(userExistList.get(0));
     }
 
     @Override
     public Optional<User> userExist(User user) {
-        String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY " +
-                "from USERS " +
-                "where EMAIL = :email " +
-                "and LOGIN = :login " +
-                "and NAME = :name " +
-                "and BIRTHDAY = :birthday";
-        log.info("Query send: " + sqlQuery);
-        return Optional.of((User) jdbcOperations.query(sqlQuery,
-                Map.of("EMAIL", user.getEmail(),
-                "LOGIN", user.getLogin(),
-                "NAME", user.getName(),
-                "BIRTHDAY", user.getBirthday()),
-                new UserRowMapper()));
+        final String sqlQuery = "select * from USERS " +
+                "where LOGIN = :login AND EMAIL = :email AND NAME = :name AND BIRTHDAY = :birthday";
+        final List<User> userExistList = jdbcOperations.query(sqlQuery, Map.of(
+                "login", user.getLogin(),
+                "email", user.getEmail(),
+                "name", user.getName(),
+                "birthday", user.getBirthday()),
+                new UserRowMapper());
+        if (userExistList.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(userExistList.get(0));
+        }
     }
 
     @Override
     public List<User> getUsersStorage() {
-        return null;
+        final String sqlQuery = "select * from USERS";
+        final List<User> userExistList = jdbcOperations.query(sqlQuery, new UserRowMapper());
+        return userExistList;
     }
 
     @Override
-    public Optional<User> addFriend(int idUser, int idFriend) {
-        return Optional.empty();
+    public void addFriend(int idUser, int idFriend) {
+        String sqlQuery = "insert into FRIENDS (USERS_ID, FRIEND_ID) values (:users_id, :friend_id)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        MapSqlParameterSource mapQuery = new MapSqlParameterSource();
+        mapQuery.addValue("users_id", idUser);
+        mapQuery.addValue("friend_id", idFriend);
+        jdbcOperations.update(sqlQuery, mapQuery, keyHolder);
+        log.info("Friend add (users_id = " + idUser + " friend_id = " + idFriend);
     }
 
     @Override
-    public Optional<User> deleteFriend(int idUser, int idFriend) {
-        return Optional.empty();
+    public void deleteFriend(int idUser, int idFriend) {
+        String sqlQuery = "delete from FRIENDS where USERS_ID = :users_id and FRIEND_ID = :friend_id";
+        MapSqlParameterSource mapQuery = new MapSqlParameterSource();
+        mapQuery.addValue("users_id", idUser);
+        mapQuery.addValue("friend_id", idFriend);
+        jdbcOperations.update(sqlQuery, mapQuery);
+        log.info("Friend delete (users_id = " + idUser + " friend_id = " + idFriend);
+    }
+
+    @Override
+    public List<User> getFriendsByUserId(int idUser) {
+        final String sqlQuery = "select * from USERS where USERS_ID IN (" +
+                "select FRIEND_ID from FRIENDS where USERS_ID = :users_id)";
+        final List<User> friendList = jdbcOperations.query(sqlQuery, Map.of("users_id", idUser),
+                new UserRowMapper());
+            return friendList;
+    }
+
+    @Override
+    public List<User> getCommonFriends(int idUser, int idFriend) {
+        final String sqlQuery = "select * from USERS where USERS_ID in " +
+                                        "(select U.FRIEND_ID from FRIENDS as U " +
+                                        "inner join FRIENDS as F on U.FRIEND_ID = F.FRIEND_ID " +
+                                        "where U.USERS_ID = :users_id and F.USERS_ID = :friend_id)";
+        final List<User> friendList = jdbcOperations.query(sqlQuery,
+                Map.of("users_id", idUser, "friend_id", idFriend),
+                new UserRowMapper());
+        return friendList;
     }
 
     private static class UserRowMapper implements RowMapper<User> {
@@ -102,5 +137,15 @@ public class UserDbStorage implements UserStorage {
                     rs.getDate("BIRTHDAY").toLocalDate()
             );
         }
+    }
+
+    private MapSqlParameterSource getMapQuery(User user) {
+        MapSqlParameterSource mapToReturn = new MapSqlParameterSource();
+        mapToReturn.addValue("email", user.getEmail());
+        mapToReturn.addValue("login", user.getLogin());
+        mapToReturn.addValue("name", user.getName());
+        mapToReturn.addValue("birthday", user.getBirthday());
+        mapToReturn.addValue("users_id", user.getId());
+        return mapToReturn;
     }
 }

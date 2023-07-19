@@ -48,19 +48,17 @@ class UserController {
     }
 
     @PutMapping(value = "/{id}/friends/{friendId}")
-    public User addFriendToUser(@PathVariable("id") int idUser,
+    public void addFriendToUser(@PathVariable("id") int idUser,
                                 @PathVariable("friendId") int idFriend) {
-        User userToReturn = userService.addFriendByIdOrThrow(idUser, idFriend);
+        userService.addFriendByIdOrThrow(idUser, idFriend);
         log.info("User id = " + idFriend + " was add to friend list user id = " + idUser);
-        return userToReturn;
     }
 
     @DeleteMapping(value = "/{id}/friends/{friendId}")
-    public User deleteFriendFromUser(@PathVariable("id") int idUser,
+    public void deleteFriendFromUser(@PathVariable("id") int idUser,
                                    @PathVariable("friendId") int idFriend) {
-        User userToReturn = userService.deleteFriendByIdOrThrow(idUser, idFriend);
+        userService.deleteFriendByIdOrThrow(idUser, idFriend);
         log.info("Friend with id = " + idFriend + " removed from user's friends id = " + idUser);
-        return userToReturn;
     }
 
     @GetMapping(value = "/{id}/friends")

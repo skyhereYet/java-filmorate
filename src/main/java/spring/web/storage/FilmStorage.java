@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FilmStorage {
-    void save(Film film);
+    Film save(Film film);
 
-    void update(Film film);
+    Film update(Film film);
 
     void delete(Film film);
 

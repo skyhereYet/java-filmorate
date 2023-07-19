@@ -8,8 +8,8 @@ import spring.web.model.User;
 import java.util.*;
 
 @Component
-public class InMemoryUserStorage /*implements UserStorage*/ {
-    /*private final Map<Integer, User> usersStorage = new HashMap<>();
+public class InMemoryUserStorage implements UserStorage {
+    private final Map<Integer, User> usersStorage = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Override
@@ -20,9 +20,10 @@ public class InMemoryUserStorage /*implements UserStorage*/ {
     }
 
     @Override
-    public void update(User user) {
+    public User update(User user) {
         usersStorage.put(user.getId(), user);
         log.info("User update: " + user.toString());
+        return user;
     }
 
     @Override
@@ -47,26 +48,32 @@ public class InMemoryUserStorage /*implements UserStorage*/ {
     }
 
     @Override
-    public Optional<User> addFriend(int idUser, int idFriend) {
+    public void addFriend(int idUser, int idFriend) {
         try {
             usersStorage.get(idUser).addFriend(idFriend);
             log.info("Friend with id " + idFriend + " added to user id = : " + idUser);
-            return Optional.of(usersStorage.get(idUser));
         } catch (RuntimeException e) {
             log.error(e.getMessage());
-            return Optional.empty();
         }
     }
 
     @Override
-    public Optional<User> deleteFriend(int idUser, int idFriend) {
+    public void deleteFriend(int idUser, int idFriend) {
         try {
             usersStorage.get(idUser).deleteFriend(idFriend);
             log.info("Friend with id = " + idFriend + " removed from user's friends id = " + idUser);
-            return Optional.of(usersStorage.get(idUser));
         } catch (RuntimeException e) {
             log.error(e.getMessage());
-            return Optional.empty();
         }
-    }*/
+    }
+
+    @Override
+    public List<User> getFriendsByUserId(int idUser) {
+        return null;
+    }
+
+    @Override
+    public List<User> getCommonFriends(int idUser, int idFriend) {
+        return null;
+    }
 }

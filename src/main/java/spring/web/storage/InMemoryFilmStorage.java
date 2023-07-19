@@ -13,15 +13,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Override
-    public void save(Film film) {
+    public Film save(Film film) {
         filmsStorage.put(film.getId(), film);
         log.info("Film add: " + film.toString());
+        return film;
     }
 
     @Override
-    public void update(Film film) {
+    public Film update(Film film) {
         filmsStorage.put(film.getId(), film);
         log.info("Film update: " + film.toString());
+        return film;
     }
 
     @Override

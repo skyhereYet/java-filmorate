@@ -28,10 +28,10 @@ public class Film {
     @ReleaseDateChecker
     private final LocalDate releaseDate;
     private int rate;
-    @JsonSerialize(using = DurationSerializer.class)
     @NotNull
-    @DurationPositiveChecker
-    private final Duration duration;
+    @Positive
+    private final Integer duration;
+    private final Integer mpaRate;
     private final List<Integer> likes = new ArrayList<>();
 
     @Override
@@ -55,4 +55,3 @@ public class Film {
         return Objects.hash(name, releaseDate);
     }
 }
-
