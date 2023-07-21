@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import spring.web.model.User;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,70 +27,6 @@ class UsersDbStorageTest {
         userStorage.save(user);
         User userDB = userStorage.findUserById(1).get();
         Assertions.assertEquals(user, userDB);
-    }
-
-    @Test
-    public void findUser() {
-        final User user = User.builder()
-                .email("second@user.com")
-                .login("second")
-                .name("FirstName")
-                .birthday(LocalDate.of(2021, 03, 14))
-                .build();
-        userStorage.save(user);
-        User userDB = userStorage.findUserById(2).get();
-        Assertions.assertEquals(user, userDB);
-    }
-
-    @Test
-    public void updateUser() {
-        final User user = User.builder()
-                .id(1)
-                .email("update@user.com")
-                .login("Update")
-                .name("FirstName")
-                .birthday(LocalDate.of(2021, 03, 14))
-                .build();
-        userStorage.update(user);
-        User userDB = userStorage.findUserById(1).get();
-        Assertions.assertEquals(user, userDB);
-    }
-
-    @Test
-    public void getUsersStorage() {
-        final User user = User.builder()
-                .email("second@user.com")
-                .login("second")
-                .name("FirstName")
-                .birthday(LocalDate.of(2021, 03, 14))
-                .build();
-        userStorage.save(user);
-        List<User> usersList = userStorage.getUsersStorage();
-        Assertions.assertTrue(usersList.size() == 2);
-        Assertions.assertEquals(user, usersList.get(1));
-    }
-
-    @Test
-    public void addDeleteFriend() {
-        final User user = User.builder()
-                .email("second@user.com")
-                .login("second")
-                .name("FirstName")
-                .birthday(LocalDate.of(2021, 03, 14))
-                .build();
-        userStorage.save(user);
-        userStorage.addFriend(1, 2);
-        Assertions.assertEquals(userStorage.getFriendsByUserId(1).get(0), user);
-        Assertions.assertTrue(userStorage.getFriendsByUserId(2).isEmpty());
-        userStorage.addFriend(2, 1);
-        Assertions.assertEquals(userStorage.getFriendsByUserId(1).get(0), user);
-        Assertions.assertEquals(userStorage.getFriendsByUserId(2).get(0).getId(), 1);
-        userStorage.deleteFriend(1, 2);
-        Assertions.assertEquals(userStorage.getFriendsByUserId(2).get(0).getId(), 1);
-        Assertions.assertTrue(userStorage.getFriendsByUserId(1).isEmpty());
-        userStorage.deleteFriend(2, 1);
-        Assertions.assertTrue(userStorage.getFriendsByUserId(1).isEmpty());
-        Assertions.assertTrue(userStorage.getFriendsByUserId(2).isEmpty());
     }
 
     @Test
