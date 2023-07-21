@@ -1,4 +1,4 @@
-package supring.web.storage;
+package spring.web.storage;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,14 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import spring.web.model.User;
-import spring.web.storage.UserDbStorage;
-import spring.web.storage.UserStorage;
+
 import java.time.LocalDate;
 import java.util.List;
 
 @JdbcTest
 @Import(UserDbStorage.class)
-class userDBStorageTest {
+class userDbStorageTest {
     @Autowired
     private UserStorage userStorage;
 
