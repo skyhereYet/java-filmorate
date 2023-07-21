@@ -13,7 +13,7 @@ import java.util.List;
 
 @JdbcTest
 @Import(UserDbStorage.class)
-class userDbStorageTest {
+class UserDbStorageTest {
     @Autowired
     private UserStorage userStorage;
 
