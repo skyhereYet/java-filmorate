@@ -15,7 +15,7 @@ public class GenresService {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private GenresStorage genresStorage;
 
-    public GenresService (GenresStorage genresStorage) {
+    public GenresService(GenresStorage genresStorage) {
         this.genresStorage = genresStorage;
     }
 
