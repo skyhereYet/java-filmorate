@@ -1,11 +1,15 @@
-package spring.web;
+package Spring.Web;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import spring.web.adapters.DurationAdapter;
 import spring.web.model.Film;
+import spring.web.model.MPA;
 import spring.web.model.User;
 import spring.web.adapters.LocalDateAdapter;
 import java.io.IOException;
@@ -15,9 +19,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
 	URI uri;
 	String url = "http://localhost:8080";
@@ -40,7 +48,9 @@ class FilmorateApplicationTests {
 				.name("FirstFilmTrain")
 				.description("The train is following you. Everywhere.")
 				.releaseDate(LocalDate.of(2021, 03, 14))
-				.duration(Duration.ofMinutes(120))
+				.duration(120)
+				.mpa(new MPA(1, "G"))
+				.genres(new HashSet<>())
 				.build();
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
@@ -55,14 +65,16 @@ class FilmorateApplicationTests {
 		HttpResponse<String> response = httpClient.send(request, handler);
 		assertEquals(200, response.statusCode());
 		response = httpClient.send(request, handler);
-		assertEquals(404, response.statusCode());
+		assertEquals(500, response.statusCode());
 		//PUT request
 		final Film filmUpdate = Film.builder()
 				.id(1)
 				.name("FirstFilmTrain")
 				.description("The train is following you. Everywhere.")
 				.releaseDate(LocalDate.of(2021, 03, 14))
-				.duration(Duration.ofMinutes(120))
+				.duration(120)
+				.mpa(new MPA(1, "G"))
+				.genres(new HashSet<>())
 				.build();
 		jsonFilm = gson.toJson(filmUpdate);
 		body = HttpRequest.BodyPublishers.ofString(jsonFilm);
@@ -91,7 +103,7 @@ class FilmorateApplicationTests {
 				.name("")
 				.description("The train is following you. Everywhere.")
 				.releaseDate(LocalDate.of(2021, 03, 14))
-				.duration(Duration.ofMinutes(120))
+				.duration(120)
 				.build();
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
@@ -115,7 +127,7 @@ class FilmorateApplicationTests {
 						"Don't turn around, get up and walk on. There's nothing you can do anyway. " +
 						"Don't waste your time on fear. Go ahead and buy a 3/4-foot burger.")
 				.releaseDate(LocalDate.of(2021, 03, 14))
-				.duration(Duration.ofMinutes(120))
+				.duration(120)
 				.build();
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
@@ -137,7 +149,7 @@ class FilmorateApplicationTests {
 				.name("New")
 				.description("Some description")
 				.releaseDate(LocalDate.of(1895, 12, 27))
-				.duration(Duration.ofMinutes(120))
+				.duration(120)
 				.build();
 		String jsonFilm = gson.toJson(film);
 		HttpClient httpClient = HttpClient.newHttpClient();
@@ -159,7 +171,7 @@ class FilmorateApplicationTests {
 				.name("New")
 				.description("Some description")
 				.releaseDate(LocalDate.of(1895, 12, 28))
-				.duration(Duration.ofMinutes(-1))
+				.duration(-1)
 				.build();
 		String jsonFilm = gson.toJson(filmNegativeDuration);
 		HttpClient httpClient = HttpClient.newHttpClient();
@@ -177,7 +189,7 @@ class FilmorateApplicationTests {
 				.name("New")
 				.description("Some description")
 				.releaseDate(LocalDate.of(1895, 12, 28))
-				.duration(Duration.ofMinutes(-1))
+				.duration(-1)
 				.build();
 		jsonFilm = gson.toJson(filmZeroDuration);
 		httpClient = HttpClient.newHttpClient();

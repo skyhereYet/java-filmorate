@@ -1,19 +1,13 @@
 package spring.web.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import spring.web.utils.DurationPositiveChecker;
-import spring.web.utils.DurationSerializer;
 import spring.web.utils.ReleaseDateChecker;
 import javax.validation.constraints.*;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Data
 @AllArgsConstructor(onConstructor_ = {@JsonCreator(mode = JsonCreator.Mode.PROPERTIES)})
@@ -27,12 +21,12 @@ public class Film {
     private final String description;
     @ReleaseDateChecker
     private final LocalDate releaseDate;
-    private int rate;
+    private final int rate;
     @NotNull
     @Positive
     private final Integer duration;
-    private final Integer mpaRate;
-    private final List<Integer> likes = new ArrayList<>();
+    private final MPA mpa;
+    private Set<Genre> genres;
 
     @Override
     public boolean equals(Object o) {
@@ -42,12 +36,8 @@ public class Film {
         return Objects.equals(name, film.name) && Objects.equals(releaseDate, film.releaseDate);
     }
 
-    public void addLike(int userID) {
-         likes.add(userID);
-    }
-
-    public void deleteLike(int userID) {
-        likes.remove(likes.indexOf(userID));
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
 
     @Override

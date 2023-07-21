@@ -2,7 +2,6 @@ package spring.web.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import spring.web.controller.FilmController;
@@ -10,10 +9,7 @@ import spring.web.exception.UserExistException;
 import spring.web.exception.ValidationException;
 import spring.web.model.User;
 import spring.web.storage.UserStorage;
-
-import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {

@@ -1,7 +1,6 @@
 package spring.web.storage;
 
 import spring.web.model.User;
-
 import java.util.List;
 import java.util.Optional;
 
