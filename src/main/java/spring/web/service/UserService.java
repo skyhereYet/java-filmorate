@@ -15,10 +15,11 @@ import java.util.*;
 public class UserService {
     @Qualifier("userDbStorage")
     private UserStorage userDbStorage;
+    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
+
     public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userDbStorage = userStorage;
     }
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     public User createOrThrow(User user) {
         validateOrThrow(user);
