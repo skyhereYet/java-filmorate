@@ -1,4 +1,4 @@
-package Spring.Web;
+package Spring.web;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
