@@ -1,4 +1,4 @@
-package Spring.web.storage;
+package supring.web.storage;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
