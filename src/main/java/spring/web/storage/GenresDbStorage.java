@@ -23,17 +23,12 @@ public class GenresDbStorage implements GenresStorage {
         final String sqlQuery = "select * from GENRES where GENRE_ID = :genre_rate_id";
         final List<Genre> genreExistList = jdbcOperations.query(sqlQuery, Map.of("genre_rate_id", idGenre),
                 new GenreRowMapper());
-        if (genreExistList.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(genreExistList.get(0));
+        return genreExistList.stream().findAny();
     }
 
     @Override
     public List<Genre> getAllGenres() {
-        final String sqlQuery = "select * from GENRES";
-        final List<Genre> genreExistList = jdbcOperations.query(sqlQuery, new GenreRowMapper());
-        return genreExistList;
+        return jdbcOperations.query("select * from GENRES", new GenreRowMapper());
     }
 
      public static class GenreRowMapper implements RowMapper<Genre> {

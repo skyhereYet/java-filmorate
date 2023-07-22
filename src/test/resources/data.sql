@@ -10,3 +10,5 @@
         INSERT INTO genres (GENRE_ID, NAME) values ('4', 'Триллер');
         INSERT INTO genres (GENRE_ID, NAME) values ('5', 'Документальный');
         INSERT INTO genres (GENRE_ID, NAME) values ('6', 'Боевик');
+
+        INSERT INTO USERS (EMAIL, LOGIN, NAME, BIRTHDAY) values ( 'email@email.ru', 'login', 'name', '1992-05-23' )

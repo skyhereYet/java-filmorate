@@ -26,6 +26,7 @@ public class FilmService {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     public Film createOrThrow(Film film) {
+        Optional<Film> f = filmDbStorage.filmExist(film);
         if (filmDbStorage.filmExist(film).isPresent()) {
             log.info("The movie exists in the storage" + film.getName());
             throw new FilmExistException("The movie exists in the storage: " + film);

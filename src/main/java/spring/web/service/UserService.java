@@ -86,15 +86,16 @@ public class UserService {
         try {
             userDbStorage.deleteFriend(idUser, idFriend);
             log.info("Friend delete (users_id = " + idUser + " friend_id = " + idFriend);
-            //userDbStorage.deleteFriend(idFriend, idUser);
-            //log.info("Friend delete (users_id = " + idFriend + " friend_id = " + idUser);
         } catch (Exception e) {
             throw new UserExistException("Unexpected error when deleting a friend: " + e.getMessage());
         }
     }
 
     public List<User> getUserFriends(int idUser) {
-            return userDbStorage.getFriendsByUserId(idUser);
+        if (userDbStorage.findUserById(idUser).isEmpty()) {
+            throw new UserExistException("User not found. ID user - " + idUser);
+        }
+        return userDbStorage.getFriendsByUserId(idUser);
     }
 
     private void validateOrThrow(User user) {

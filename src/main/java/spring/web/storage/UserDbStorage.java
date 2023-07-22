@@ -33,7 +33,7 @@ public class UserDbStorage implements UserStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource mapQuery = getMapQuery(user);
         jdbcOperations.update(sqlQuery, mapQuery, keyHolder);
-        user.setId(Objects.requireNonNull(keyHolder.getKey().intValue()));
+        user.setId(keyHolder.getKey().intValue());
         log.info("User add: " + user);
         return user;
     }
@@ -52,10 +52,7 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> findUserById(int id) {
         final String sqlQuery = "select * from USERS where USERS_ID = :users_id";
         final List<User> userExistList = jdbcOperations.query(sqlQuery, Map.of("users_id", id), new UserRowMapper());
-        if (userExistList.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(userExistList.get(0));
+        return userExistList.stream().findAny();
     }
 
     @Override
@@ -68,18 +65,12 @@ public class UserDbStorage implements UserStorage {
                 "name", user.getName(),
                 "birthday", user.getBirthday()),
                 new UserRowMapper());
-        if (userExistList.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.ofNullable(userExistList.get(0));
-        }
+        return userExistList.stream().findAny();
     }
 
     @Override
     public List<User> getUsersStorage() {
-        final String sqlQuery = "select * from USERS";
-        final List<User> userExistList = jdbcOperations.query(sqlQuery, new UserRowMapper());
-        return userExistList;
+        return jdbcOperations.query("select * from USERS", new UserRowMapper());
     }
 
     @Override
@@ -107,9 +98,8 @@ public class UserDbStorage implements UserStorage {
     public List<User> getFriendsByUserId(int idUser) {
         final String sqlQuery = "select * from USERS where USERS_ID IN (" +
                 "select FRIEND_ID from FRIENDS where USERS_ID = :users_id)";
-        final List<User> friendList = jdbcOperations.query(sqlQuery, Map.of("users_id", idUser),
+        return jdbcOperations.query(sqlQuery, Map.of("users_id", idUser),
                 new UserRowMapper());
-            return friendList;
     }
 
     @Override
@@ -118,10 +108,9 @@ public class UserDbStorage implements UserStorage {
                                         "(select U.FRIEND_ID from FRIENDS as U " +
                                         "inner join FRIENDS as F on U.FRIEND_ID = F.FRIEND_ID " +
                                         "where U.USERS_ID = :users_id and F.USERS_ID = :friend_id)";
-        final List<User> friendList = jdbcOperations.query(sqlQuery,
+        return jdbcOperations.query(sqlQuery,
                 Map.of("users_id", idUser, "friend_id", idFriend),
                 new UserRowMapper());
-        return friendList;
     }
 
     private static class UserRowMapper implements RowMapper<User> {

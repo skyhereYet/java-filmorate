@@ -23,17 +23,12 @@ public class MPADbStorage implements MPAStorage {
         final String sqlQuery = "select * from MPA_RATE where MPA_RATE_ID = :mpa_rate_id";
         final List<MPA> mpaExistList = jdbcOperations.query(sqlQuery, Map.of("mpa_rate_id", idMPA),
                 new MPARowMapper());
-        if (mpaExistList.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(mpaExistList.get(0));
+        return mpaExistList.stream().findAny();
     }
 
     @Override
     public List<MPA> getAllMPA() {
-        final String sqlQuery = "select * from MPA_RATE";
-        final List<MPA> mpaExistList = jdbcOperations.query(sqlQuery, new MPARowMapper());
-        return mpaExistList;
+        return jdbcOperations.query("select * from MPA_RATE", new MPARowMapper());
     }
 
     private static class MPARowMapper implements RowMapper<MPA> {
