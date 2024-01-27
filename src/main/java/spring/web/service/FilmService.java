@@ -3,40 +3,41 @@ package spring.web.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import spring.web.controller.FilmController;
 import spring.web.exception.FilmExistException;
 import spring.web.model.Film;
 import spring.web.model.User;
 import spring.web.storage.FilmStorage;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class FilmService {
-    @Autowired
-    private FilmStorage inMemoryFilmStorage;
+    @Qualifier("filmDbStorage")
+    private FilmStorage filmDbStorage;
+
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+        this.filmDbStorage = filmStorage;
+    }
+
     @Autowired
     private UserService userService;
-    private int id = 1;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     public Film createOrThrow(Film film) {
-        if (inMemoryFilmStorage.filmExist(film).isPresent()) {
+        Optional<Film> f = filmDbStorage.filmExist(film);
+        if (filmDbStorage.filmExist(film).isPresent()) {
             log.info("The movie exists in the storage" + film.getName());
             throw new FilmExistException("The movie exists in the storage: " + film);
         } else {
-            film.setId(id++);
-            inMemoryFilmStorage.save(film);
+            return filmDbStorage.save(film);
         }
-        return film;
     }
 
     public Film updateOrThrow(Film film) {
-        if (inMemoryFilmStorage.findFilmById(film.getId()).isPresent()) {
-            inMemoryFilmStorage.update(film);
-            return film;
+        if (filmDbStorage.findFilmById(film.getId()).isPresent()) {
+            return filmDbStorage.update(film);
         }  else {
             log.info("The movie not exists in the storage: " + film);
             throw new FilmExistException("The movie not exists in the storage: " + film);
@@ -45,41 +46,39 @@ public class FilmService {
 
     public List<Film> getFilmsList() {
         log.info("Return film storage list");
-        return inMemoryFilmStorage.getFilmsStorage();
+        return filmDbStorage.getFilmsStorage();
     }
 
-    public Film addLikeOrThrow(int idFilm, int idUser) {
-        Optional<Film> filmO = inMemoryFilmStorage.findFilmById(idFilm);
+    public void addLikeOrThrow(int idFilm, int idUser) {
+        Optional<Film> filmO = filmDbStorage.findFilmById(idFilm);
         Optional<User> userO = Optional.ofNullable(userService.getUserByIdOrThrow(idUser));
+        if (filmDbStorage.checkLikes(idFilm, idUser)) {
+            throw new FilmExistException("Film already liked user with ID - " + idUser);
+        }
         if (filmO.isPresent() && userO.isPresent()) {
-            if (filmO.get().getLikes().contains(idUser)) {
-                throw new FilmExistException("Film already liked user with ID - " + idUser);
-            }
-            filmO.get().addLike(idUser);
+            filmDbStorage.addLike(idFilm, idUser);
             log.info("The film (ID - " + idFilm + ") was liked by the user ID - " + idUser);
-            return filmO.get();
         } else {
             throw new FilmExistException("The film with ID -" + idFilm + " not found");
         }
     }
 
-    public Film deleteLikeOrThrow(int idFilm, int idUser) {
-        Optional<Film> filmO = inMemoryFilmStorage.findFilmById(idFilm);
+    public void deleteLikeOrThrow(int idFilm, int idUser) {
+        Optional<Film> filmO = filmDbStorage.findFilmById(idFilm);
         Optional<User> userO = Optional.ofNullable(userService.getUserByIdOrThrow(idUser));
-        if (filmO.isPresent() && userO.isPresent()) {
-            if (filmO.get().getLikes().contains(idUser)) {
-                filmO.get().deleteLike(idUser);
-                log.info("The user (ID - " + idUser + ") removed like from the film (ID -" + idFilm);
-                return filmO.get();
-            }
+        if (!filmDbStorage.checkLikes(idFilm, idUser)) {
             throw new FilmExistException("The film (ID - " + idFilm + ") was not liked by the user ID - " + idUser);
+        }
+        if (filmO.isPresent() && userO.isPresent()) {
+            filmDbStorage.deleteLike(idFilm, idUser);
+            log.info("The film (ID - " + idFilm + ") was disliked by the user ID - " + idUser);
         } else {
             throw new FilmExistException("The film with ID -" + idFilm + " not found");
         }
     }
 
     public Film getFilmByIdOrThrow(int id) {
-        Optional<Film> filmO = inMemoryFilmStorage.findFilmById(id);
+        Optional<Film> filmO = filmDbStorage.findFilmById(id);
         if (filmO.isPresent()) {
             log.info("Return user - " + filmO.get());
             return filmO.get();
@@ -89,9 +88,7 @@ public class FilmService {
     }
 
     public List<Film> getFilmPopular(int count) {
-        return inMemoryFilmStorage.getFilmsStorage().stream()
-                .sorted((f0, f1) -> Integer.compare(f1.getLikes().size(), f0.getLikes().size()))
-                .limit(count)
-                .collect(Collectors.toList());
+        log.info("Return popular film, count = " + count);
+        return filmDbStorage.getFilmPopular(count);
     }
 }

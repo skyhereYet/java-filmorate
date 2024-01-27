@@ -18,7 +18,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        log.info("POST request");
+        log.info("POST request. Create film: " + film);
         filmService.createOrThrow(film);
         log.info("Film add: " + film.toString());
         return film;
@@ -39,19 +39,17 @@ public class FilmController {
     }
 
     @PutMapping(value = "/{id}/like/{userId}")
-    public Film addFriendToUser(@PathVariable("id") int idFilm,
+    public void addLikeToFilm(@PathVariable("id") int idFilm,
                                 @PathVariable("userId") int idUser) {
-        Film filmToReturn = filmService.addLikeOrThrow(idFilm, idUser);
+        filmService.addLikeOrThrow(idFilm, idUser);
         log.info("The film (ID - " + idFilm + ") was liked by the user ID - " + idUser);
-        return filmToReturn;
     }
 
     @DeleteMapping(value = "/{id}/like/{userId}")
-    public Film deleteFriendToUser(@PathVariable("id") int idFilm,
+    public void deleteLikeFromFilm(@PathVariable("id") int idFilm,
                                 @PathVariable("userId") int idUser) {
-        Film filmToReturn = filmService.deleteLikeOrThrow(idFilm, idUser);
+        filmService.deleteLikeOrThrow(idFilm, idUser);
         log.info("The film (ID - " + idFilm + ") was disliked by the user ID - " + idUser);
-        return filmToReturn;
     }
 
     @GetMapping(value = "/{id}")

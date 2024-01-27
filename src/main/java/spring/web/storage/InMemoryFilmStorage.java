@@ -13,15 +13,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Override
-    public void save(Film film) {
+    public Film save(Film film) {
         filmsStorage.put(film.getId(), film);
         log.info("Film add: " + film.toString());
+        return film;
     }
 
     @Override
-    public void update(Film film) {
+    public Film update(Film film) {
         filmsStorage.put(film.getId(), film);
         log.info("Film update: " + film.toString());
+        return film;
     }
 
     @Override
@@ -49,5 +51,23 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getFilmsStorage() {
         return new ArrayList<>(filmsStorage.values());
+    }
+
+    @Override
+    public boolean checkLikes(int idFilm, int idUser) {
+        return false;
+    }
+
+    @Override
+    public void addLike(int idFilm, int idUser) {
+    }
+
+    @Override
+    public void deleteLike(int idFilm, int idUser) {
+    }
+
+    @Override
+    public List<Film> getFilmPopular(int count) {
+        return null;
     }
 }

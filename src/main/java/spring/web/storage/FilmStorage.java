@@ -1,14 +1,13 @@
 package spring.web.storage;
 
 import spring.web.model.Film;
-
 import java.util.List;
 import java.util.Optional;
 
 public interface FilmStorage {
-    void save(Film film);
+    Film save(Film film);
 
-    void update(Film film);
+    Film update(Film film);
 
     void delete(Film film);
 
@@ -17,4 +16,12 @@ public interface FilmStorage {
     Optional<Film> filmExist(Film film);
 
     List<Film> getFilmsStorage();
+
+    boolean checkLikes(int idFilm, int idUser);
+
+    void addLike(int idFilm, int idUser);
+
+    void deleteLike(int idFilm, int idUser);
+
+    List<Film> getFilmPopular(int count);
 }
